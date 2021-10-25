@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Main, Box, Header, TransactionBadge } from '@aragon/ui';
-import { providers, utils } from 'ethers';
+import { useCallback, useEffect, useState } from "react";
+import { Main, Box, Header, Link, DropDown } from "@aragon/ui";
+import { providers, utils } from "ethers";
+import { networks, getLogUrl, getExplorerUrlByTransaction } from "./networks";
 
 const abi = [
-`function newTokenAndInstance(
+  `function newTokenAndInstance(
   string _tokenName,
   string _tokenSymbol,
   string id,
@@ -12,100 +13,136 @@ const abi = [
   uint64[3] _votingSettings,
   uint64 _financePeriod,
   bool _useAgentAsVault
-)`, 
-`function newInstance(
+)`,
+  `function newInstance(
   string id,
   address[] memory _holders,
   uint256[] memory _stakes,
   uint64[3] memory _votingSettings,
   uint64 _financePeriod,
   bool _useAgentAsVault
-)`]
+)`,
+];
 
-// topic = ClaimSubdomain
-const topic = '0xe27a5a369e0d2c5056ccfcbd5f83f145f43350142d42aaf46ff9a9e461d543df'
-// FIFSResolvingRegistrar (AragonID)
-const address = '0xB1b9fB937A11873380b3B87a1eF8063a66e54822'
-const GETLOG_URL = 'https://api.polygonscan.com/api?' +
-            'module=logs&action=getLogs&fromBlock=186100' + 
-            `&address=${address}` +
-            `&topic0=${topic}` + 
-            `&apikey=2TQMPNQB5UPFE1IVIW53ZBB1WVXQD6A29P`;
-
-
-const appendAragonId = (name:string) => name + '.aragonid.eth'
+const appendAragonId = (name: string) => name + ".aragonid.eth";
 
 type DaoInfo = {
-  name?: string
-  hash?: string
-}
+  name?: string;
+  hash: string;
+  timestamp: Date;
+  blockNumber: number;
+};
+
+const networkNames = Array.from(networks.keys());
 
 function App() {
-  const [result, setResult] = useState<DaoInfo[]>([])
-  
-  
+  const [result, setResult] = useState<DaoInfo[]>([]);
+  const [selectedNetwork, setNetworkIndex] = useState<number>(0);
+
   useEffect(() => {
     async function getData() {
-      const provider = new providers.AlchemyProvider(137)
-      const iface = new utils.Interface(abi)
-      const response = await fetch(GETLOG_URL, {
-        method: 'GET',
+      const networkType = networkNames[selectedNetwork];
+      const network = networks.get(networkType);
+      if (!network) return;
+
+      const provider = new providers.JsonRpcProvider(network.rpcUrl);
+      const iface = new utils.Interface(abi);
+      const response = await fetch(getLogUrl(networkType), {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-      const sigNewTokenAndInstance = iface.getSighash('newTokenAndInstance');
-      const sigNewInstance = iface.getSighash('newInstance');
+
+      const sigNewTokenAndInstance = iface.getSighash("newTokenAndInstance");
+      const sigNewInstance = iface.getSighash("newInstance");
 
       const jsonResult = await response.json();
-      console.log('respnse', jsonResult.result.length);
-      const names: DaoInfo[] = await Promise.all(jsonResult.result.map(async (res: any) => {
-        const hash = res.transactionHash;
+      const names: DaoInfo[] = await Promise.all(
+        jsonResult.result.map(async (res: any) => {
+          const hash = res.transactionHash;
+          const timestamp = new Date(parseInt(res.timeStamp) * 1000);
+          const tx = await provider.getTransaction(hash);
+          if (tx.data) {
+            if (tx.data.startsWith(sigNewTokenAndInstance)) {
+              const decoded = iface.decodeFunctionData(
+                "newTokenAndInstance",
+                tx.data
+              );
+              return { hash, name: appendAragonId(decoded.id), timestamp };
+            }
 
-        const tx = await provider.getTransaction(hash)
-        if(tx.data)
-        {
-          if( tx.data.startsWith(sigNewTokenAndInstance)) {
-            const decoded = iface.decodeFunctionData("newTokenAndInstance", tx.data);
-            return { hash, name: appendAragonId(decoded.id) }
+            if (tx.data.startsWith(sigNewInstance)) {
+              const decoded = iface.decodeFunctionData("newInstance", tx.data);
+              return { hash, name: appendAragonId(decoded.id), timestamp };
+            }
           }
-          
-          if( tx.data.startsWith(sigNewInstance)) {
-            const decoded = iface.decodeFunctionData("newInstance", tx.data);
-            return { hash, name: appendAragonId(decoded.id) }
-          }
-        }
-        return { hash };
-      }))
+          return { hash, timestamp, blockNumber: parseInt(res.blockNumber) };
+        })
+      );
 
-      setResult(names);
+      setResult(names.filter(({ name }) => Boolean(name)));
     }
 
-    getData()
-  
-  }, [])
-  
+    getData();
+  }, [selectedNetwork]);
+
+  const handleNetworkChange = useCallback((index: number) => {
+    setNetworkIndex(index);
+    setResult([]);
+  }, []);
 
   return (
     <div className="scroll-view-container">
       <div className="scroll-view">
         <Main scrollView={true}>
-          <Header primary="Aragon DAO (Polygon)" />
+          <Header
+            primary="Aragon DAO"
+            secondary={
+              <DropDown
+                placeholder="ArbitrumTestnet"
+                items={networkNames}
+                selected={selectedNetwork}
+                onChange={handleNetworkChange}
+              />
+            }
+          />
           <div>total: {result.length}</div>
           <Box>
-          <table>
-            <tr><td><b>TX hash</b></td><td><b>ENS name</b></td></tr>
-            {
-              
-              result.map((res, i) => {
-                return (
-                  <tr key={i}>
-                  <td><TransactionBadge shorten={false} networkType='matic' transaction={res.hash} /></td>
-                  <td><span> {res.name? res.name : ''}</span></td>
-                  </tr>
-                )
-              })  
-            }
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <b>Date</b>
+                  </td>
+                  <td>
+                    <b>TX hash</b>
+                  </td>
+                  <td>
+                    <b>ENS name</b>
+                  </td>
+                </tr>
+                {result.map((res, i) => {
+                  return (
+                    <tr key={i}>
+                      <td>{res.timestamp?.toDateString()}</td>
+                      <td>
+                        <Link
+                          href={getExplorerUrlByTransaction(
+                            networkNames[selectedNetwork],
+                            res.hash
+                          )}
+                        >
+                          {res.hash}
+                        </Link>
+                      </td>
+                      <td>
+                        <span> {res.name ? res.name : ""}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </Box>
         </Main>
@@ -113,7 +150,5 @@ function App() {
     </div>
   );
 }
-
-
 
 export default App;
