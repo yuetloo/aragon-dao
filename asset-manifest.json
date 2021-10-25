@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/aragon-dao/static/css/main.f0538d58.chunk.css",
-    "main.js": "/aragon-dao/static/js/main.8bf72473.chunk.js",
-    "main.js.map": "/aragon-dao/static/js/main.8bf72473.chunk.js.map",
+    "main.js": "/aragon-dao/static/js/main.3024ad17.chunk.js",
+    "main.js.map": "/aragon-dao/static/js/main.3024ad17.chunk.js.map",
     "runtime-main.js": "/aragon-dao/static/js/runtime-main.4fa4f760.js",
     "runtime-main.js.map": "/aragon-dao/static/js/runtime-main.4fa4f760.js.map",
-    "static/js/2.faeae18a.chunk.js": "/aragon-dao/static/js/2.faeae18a.chunk.js",
-    "static/js/2.faeae18a.chunk.js.map": "/aragon-dao/static/js/2.faeae18a.chunk.js.map",
+    "static/js/2.7f3c1f0c.chunk.js": "/aragon-dao/static/js/2.7f3c1f0c.chunk.js",
+    "static/js/2.7f3c1f0c.chunk.js.map": "/aragon-dao/static/js/2.7f3c1f0c.chunk.js.map",
     "static/js/3.514ea27f.chunk.js": "/aragon-dao/static/js/3.514ea27f.chunk.js",
     "static/js/3.514ea27f.chunk.js.map": "/aragon-dao/static/js/3.514ea27f.chunk.js.map",
     "index.html": "/aragon-dao/index.html",
     "static/css/main.f0538d58.chunk.css.map": "/aragon-dao/static/css/main.f0538d58.chunk.css.map",
-    "static/js/2.faeae18a.chunk.js.LICENSE.txt": "/aragon-dao/static/js/2.faeae18a.chunk.js.LICENSE.txt"
+    "static/js/2.7f3c1f0c.chunk.js.LICENSE.txt": "/aragon-dao/static/js/2.7f3c1f0c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.4fa4f760.js",
-    "static/js/2.faeae18a.chunk.js",
+    "static/js/2.7f3c1f0c.chunk.js",
     "static/css/main.f0538d58.chunk.css",
-    "static/js/main.8bf72473.chunk.js"
+    "static/js/main.3024ad17.chunk.js"
   ]
 }
