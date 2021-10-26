@@ -8,6 +8,7 @@ export const networks = new Map([
       apiKey: "4GJTTHSHGA5T1HYR5FPWYF8Q3QEERGK2ZM",
       // FIFSResolvingRegistrar (AragonID)
       aragonIdAddress: "0x9060373BD2Eaf09965E1c6791348941F89C8Bd5a",
+      fromBlock: 5601238,
     },
   ],
   [
@@ -20,6 +21,7 @@ export const networks = new Map([
       apiKey: "2TQMPNQB5UPFE1IVIW53ZBB1WVXQD6A29P",
       // FIFSResolvingRegistrar (AragonID)
       aragonIdAddress: "0xB1b9fB937A11873380b3B87a1eF8063a66e54822",
+      fromBlock: 18617853,
     },
   ],
   [
@@ -32,6 +34,7 @@ export const networks = new Map([
       apiKey: "2TQMPNQB5UPFE1IVIW53ZBB1WVXQD6A29P",
       // FIFSResolvingRegistrar (AragonID)
       aragonIdAddress: "0xB0CeC6F20Ea617D0CdeFef6521AaD99d21876Ad5",
+      fromBlock: 17883970,
     },
   ],
   [
@@ -43,6 +46,7 @@ export const networks = new Map([
       apiKey: "HCDV8YBBWDK369IPAA8QMBE2DIEP94CEB7",
       // FIFSResolvingRegistrar (AragonID)
       aragonIdAddress: "0x546aA2EaE2514494EeaDb7bbb35243348983C59d",
+      fromBlock: 10000000,
     },
   ],
 ]);
@@ -55,7 +59,7 @@ export function getLogUrl(networkType: string): string {
 
   return network
     ? `${network.apiUrl}?` +
-        "module=logs&action=getLogs&fromBlock=186100" +
+        `module=logs&action=getLogs&fromBlock=${network.fromBlock}` +
         `&address=${network.aragonIdAddress}` +
         `&topic0=${topic}` +
         `&apikey=${network.apiKey}`
