@@ -1,0 +1,28 @@
+# Do not edit subgraph.yaml,this is a generated file.
+# Instead, edit subgraph.template.yaml and run `yarn manifest-<network>`
+specVersion: 0.0.2
+description: A template for Aragon DAO subgraph
+repository: https://github.com/yuetloo/aragon-dao
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: FIFSResolvingRegistrar
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: FIFSResolvingRegistrar
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FIFSResolvingRegistrar
+      abis:
+        - name: FIFSResolvingRegistrar
+          file: ./abis/FIFSResolvingRegistrar.json
+      eventHandlers:
+        - event: ClaimSubdomain(indexed bytes32,indexed address,indexed address)
+          handler: handleClaimSubdomain
+      file: ./src/FIFSResolvingRegistrarMapping.ts

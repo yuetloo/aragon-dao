@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { Main, Box, Header, DropDown } from "@aragon/ui";
-import { networks, getLogUrl } from "./networks";
+import { networks } from "./networks";
 import DaoTableRow from "./components/DaoTableRow";
+import { Web3 } from "./utils/web3";
 
 type DaoInfo = {
   hash: string;
   timestamp: Date;
   blockNumber: number;
+  data: string;
 };
 
 const networkNames = Array.from(networks.keys());
+const batchSize = 1000;
 
 function App() {
   const [result, setResult] = useState<DaoInfo[]>([]);
@@ -23,28 +26,23 @@ function App() {
       const network = networks.get(networkType);
       if (!network) return;
 
-      const response = await fetch(getLogUrl(networkType), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const web3 = new Web3(networkType);
+      setResult([]);
+      let skip = 0;
+      let loop = true;
+      do {
+        const batchResult = await web3.getDomains(batchSize, skip);
+        skip += batchSize;
 
-      const jsonResult = await response.json();
+        if (batchResult.length === 0) {
+          break;
+        }
+        if (cancel) {
+          break;
+        }
 
-      if (!cancel) {
-        setResult(
-          jsonResult.result
-            .map((res: any, row: number) => {
-              const hash = res.transactionHash;
-              const timestamp = new Date(parseInt(res.timeStamp) * 1000);
-              return { row, hash, timestamp, blockNumber: res.blockNumber };
-            })
-            .sort((rowA: any, rowB: any) => {
-              return rowB.row - rowA.row;
-            })
-        );
-      }
+        setResult((currentResult) => currentResult.concat(batchResult));
+      } while (loop);
     }
 
     getData();
@@ -77,7 +75,7 @@ function App() {
           <Box>
             <table>
               <tbody>
-                <tr>
+                <tr key="header">
                   <td>
                     <b>Date</b>
                   </td>
@@ -91,9 +89,10 @@ function App() {
                 {result.map((res, i) => {
                   return (
                     <DaoTableRow
-                      rowIndex={i}
+                      key={i}
                       hash={res.hash}
                       timestamp={res.timestamp}
+                      data={res.data}
                       networkName={networkNames[selectedNetwork]}
                     />
                   );

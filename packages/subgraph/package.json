@@ -1,0 +1,28 @@
+{
+  "name": "aragon-dao-subgraph",
+  "version": "1.0.0",
+  "description": "Subgraph for tracking Aragon V1 DAO",
+  "scripts": {
+    "build": "scripts/build-subgraph.sh",
+    "manifest-mainnet": "scripts/build-manifest.sh mainnet",
+    "manifest-polygon": "scripts/build-manifest.sh polygon",
+    "manifest-mumbai": "scripts/build-manifest.sh mumbai",
+    "manifest-arbitrum": "scripts/build-manifest.sh arbitrum",
+    "deploy-mainnet": "scripts/deploy.sh yuetloo aragon-dao mainnet",
+    "deploy-polygon": "scripts/deploy.sh yuetloo aragon-dao polygon",
+    "deploy-mumbai": "scripts/deploy.sh yuetloo aragon-dao mumbai",
+    "deploy-arbitrum": "scripts/deploy.sh yuetloo aragon-dao arbitrum"
+  },
+  "keywords": [
+    "subgraph",
+    "aragon",
+    "DAO"
+  ],
+  "author": "yuetloo",
+  "license": "MIT",
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.25.1",
+    "@graphprotocol/graph-ts": "^0.24.1",
+    "mustache": "^4.2.0"
+  }
+}

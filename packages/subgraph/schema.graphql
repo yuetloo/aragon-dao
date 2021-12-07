@@ -1,0 +1,10 @@
+type Domain @entity {
+  id: ID!
+  name: String
+  subnode: Bytes!
+  owner: Bytes! 
+  resolver: Bytes! 
+  createdAt: BigInt!
+  blockNumber: BigInt!
+  txInput: Bytes
+}
