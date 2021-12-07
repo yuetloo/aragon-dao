@@ -5,9 +5,9 @@ class Decoder {
 
   getName(transactionInput: Bytes): string {
     let types = this.types || "";
-    //let data = transactionInput.slice(4);
-    //let dataInBytes = Bytes.fromUint8Array(data);
-    let decoded = ethereum.decode(types, transactionInput);
+    let data = transactionInput.slice(4);
+    let dataInBytes = Bytes.fromUint8Array(data);
+    let decoded = ethereum.decode(types, dataInBytes);
 
     if (!decoded) {
       return "";
